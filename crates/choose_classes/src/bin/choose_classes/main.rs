@@ -1,3 +1,4 @@
+use choose_classes::Config;
 use reqwest::{Client, Error};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -6,28 +7,6 @@ use std::io::Write;
 use std::time::Duration;
 use tokio::time::sleep;
 use urlencoding::encode;
-
-const COURSE_LIST_URL: &str = "https://newxk.urp.seu.edu.cn/xsxk/elective/clazz/list";
-const COURSE_SELECT_URL: &str = "https://newxk.urp.seu.edu.cn/xsxk/elective/clazz/add";
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Course {
-    tc_list: Vec<TcList>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct TcList {
-    jxbid: String,
-    secret_val: String,
-    kcm: String,
-    sksj: Option<String>,
-}
-
-#[derive(Serialize, Deserialize)]
-struct Config {
-    token: String,
-    batch_id: String,
-}
 
 async fn get_course_list(
     class_type: &str,
@@ -43,8 +22,9 @@ async fn get_course_list(
         "campus": "1",
     });
 
+    let course_list_url = "https://newxk.urp.seu.edu.cn/xsxk/elective/clazz/list";
     let res = client
-        .post(COURSE_LIST_URL)
+        .post(course_list_url)
         .header("Authorization", token)
         .header("Content-Type", "application/json;charset=UTF-8")
         .header("Accept", "application/json, text/plain, */*")
@@ -66,7 +46,7 @@ async fn get_course_list(
     let body = res.text().await?;
     // println!("Content: {}", body);
 
-    let file_path = "resource/jsons/classes.json";
+    let file_path = "resource/classes.json";
     let mut file = fs::File::create(file_path).unwrap();
     file.write_all(body.as_bytes()).unwrap();
 
@@ -88,8 +68,10 @@ async fn select_course(
         encode(course_secret)
     );
 
+    let course_select_url = "https://newxk.urp.seu.edu.cn/xsxk/elective/clazz/add";
+
     let res = client
-        .post(COURSE_SELECT_URL)
+        .post(course_select_url)
         .header("Authorization", token)
         .header("Content-Type", "application/x-www-form-urlencoded")
         .header("Accept", "application/json, text/plain, */*")
@@ -159,7 +141,7 @@ async fn gene_wish_list(client: &Client, token: &str, batch_id: &str) -> Result<
 
 async fn choose_courses(client: &Client, token: &str, batch_id: &str) -> Result<(), Error> {
     let want_courses: Vec<WantCourse> =
-        serde_json::from_str(&fs::read_to_string("resource/jsons/choose.json").unwrap()).unwrap();
+        serde_json::from_str(&fs::read_to_string("resource/choose.json").unwrap()).unwrap();
 
     let mut i = 0;
     for course in want_courses {
@@ -194,12 +176,12 @@ struct WantCourse {
 #[tokio::main]
 async fn main() {
     let config: Config =
-        serde_yaml::from_str(&fs::read_to_string("resource/jsons/config.yaml").unwrap()).unwrap();
+        serde_yaml::from_str(&fs::read_to_string("resource/config.yaml").unwrap()).unwrap();
     let token = &config.token;
     let batch_id = &config.batch_id;
 
     let client = Client::new();
 
     gene_wish_list(&client, token, batch_id).await.unwrap();
-    // choose_courses(&client, token, batch_id).await.unwrap();
+    choose_courses(&client, token, batch_id).await.unwrap();
 }

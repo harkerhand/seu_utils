@@ -2,4 +2,6 @@
 
 .idea
 
-resource/jsons/*
+resource/*.json
+resource/*.yaml
+resource/*.txt
