@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 pub struct Config {
     pub token: String,
     pub batch_id: String,
-    pub route: String,
-    pub username: String,
+    pub loginname: String,
     pub password: String,
 }

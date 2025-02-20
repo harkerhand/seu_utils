@@ -5,3 +5,4 @@
 resource/*.json
 resource/*.yaml
 resource/*.txt
+resource/*.png
