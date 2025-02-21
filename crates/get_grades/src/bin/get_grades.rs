@@ -35,6 +35,8 @@ async fn main() {
             name: grade["KCM"].as_str().unwrap().to_string(),
             class_type: grade["KCXZDM_DISPLAY"].as_str().unwrap().to_string(),
             score: grade["ZCJ"].as_str().unwrap().parse().unwrap(),
+            credit: grade["XF"].as_str().unwrap().parse().unwrap(),
+            term: grade["XNXQDM"].as_str().unwrap().into(),
         })
         .collect::<Vec<Course>>();
     fs::write(
