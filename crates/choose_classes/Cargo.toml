@@ -16,8 +16,8 @@ image = "0.25.5"
 
 [[bin]]
 name = "choose_classes"
-path = "src/bin/choose_classes/main.rs"
+path = "src/bin/choose_classes.rs"
 
 [[bin]]
 name = "get_tokens"
-path = "src/bin/get_tokens/main.rs"
+path = "src/bin/get_tokens.rs"
