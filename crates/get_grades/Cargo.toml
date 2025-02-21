@@ -1,0 +1,15 @@
+[package]
+name = "get_grades"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+tokio = { workspace = true, features = ["full"] }
+serde = { workspace = true }
+reqwest = { workspace = true }
+serde_json = { workspace = true }
+
+
+[[bin]]
+name = "get_grades"
+path = "src/bin/get_grades.rs"
