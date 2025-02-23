@@ -13,7 +13,7 @@ use tokio;
 #[clap(version, name = "get_tokens")]
 #[command(version, about, long_about = None)]
 struct Cli {
-    /// 配置文件路径
+    /// 配置文件路径 IN_NEED
     #[clap(long, default_value = "resource/config.yaml")]
     config_yaml: PathBuf,
     /// 临时验证码路径

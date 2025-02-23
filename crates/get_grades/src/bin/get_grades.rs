@@ -10,7 +10,7 @@ use tokio;
 #[clap(version, name = "get_grades")]
 #[command(version, about, long_about = None)]
 struct Cli {
-    /// cookie路径
+    /// cookie路径 IN_NEED
     #[clap(short, long, default_value = "resource/grades_cookie.txt")]
     cookie_txt: PathBuf,
     /// 保存导出成绩的json文件路径
