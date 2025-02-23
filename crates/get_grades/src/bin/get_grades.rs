@@ -1,16 +1,32 @@
+use clap::Parser;
 use get_grades::Course;
 use reqwest::Client;
 use serde_json::Value;
 use std::fs;
+use std::path::PathBuf;
 use tokio;
+
+#[derive(Parser)]
+#[clap(version, name = "get_grades")]
+#[command(version, about, long_about = None)]
+struct Cli {
+    #[clap(short, long, default_value = "resource/grades_cookie.txt")]
+    cookie_txt: PathBuf,
+    #[clap(short, long, default_value = "resource/grades.json")]
+    grades_json: PathBuf,
+    #[clap(short, long, default_value = "resource/raw_grades.json")]
+    raw_grades_json: PathBuf,
+}
 
 #[tokio::main]
 async fn main() {
-    let cookio: String = fs::read_to_string("resource/grades_cookie.txt").unwrap();
+    let cli = Cli::parse();
+
+    let cookie: String = fs::read_to_string(cli.cookie_txt).unwrap();
     let client = Client::new();
     let grades_url = "https://ehall.seu.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do";
     let response =  client.post(grades_url)
-        .header("Cookie", cookio)
+        .header("Cookie", cookie)
         .header(
             "user-agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0"
@@ -25,7 +41,7 @@ async fn main() {
         let parsed: Value = serde_json::from_str(&text).unwrap();
         serde_json::to_string_pretty(&parsed).unwrap()
     };
-    fs::write("resource/raw_grades.json", formatted_json).unwrap();
+    fs::write(cli.raw_grades_json, formatted_json).unwrap();
     let response: Value = serde_json::from_str(&text).unwrap();
 
     let grades = response["datas"]["xscjcx"]["rows"].as_array().unwrap();
@@ -40,7 +56,7 @@ async fn main() {
         })
         .collect::<Vec<Course>>();
     fs::write(
-        "resource/grades.json",
+        cli.grades_json,
         serde_json::to_string_pretty(&grades).unwrap(),
     )
     .unwrap();
