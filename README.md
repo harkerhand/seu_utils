@@ -25,6 +25,11 @@
 ### 获取选课系统token和batch_id
 
 ```text
+cargo run -p choose_classes --bin get_tokens -- <OPTIONS>
+```
+
+```text
+
 Usage: get_tokens.exe [OPTIONS]
 
 Options:
@@ -50,6 +55,10 @@ password: <your password>
 ### 选课课程查询 & 课程信息解析 & 生成选课计划并自动选课
 
 ```text
+cargo run -p choose_classes --bin choose_classes -- <OPTIONS>
+```
+
+```text
 Usage: choose_classes.exe [OPTIONS]
 
 Options:
@@ -65,6 +74,10 @@ Options:
 ### 课程成绩查询
 
 ```text
+cargo run -p get_grades --bin get_grades -- <OPTIONS>
+```
+
+```text
 Usage: get_grades.exe [OPTIONS]
 
 Options:
@@ -78,6 +91,10 @@ Options:
 cookie 需要自行打开选课系统，在开发者调试台中查看 `*.do` 的请求头获取。此cookie时效性很强，建议每次使用前都重新获取。
 
 ### 绩点计算
+
+```text
+cargo run -p get_grades --bin calc_gpa -- <OPTIONS>
+```
 
 ```text
 Usage: calc_gpa.exe [OPTIONS]
