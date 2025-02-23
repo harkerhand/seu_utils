@@ -57,6 +57,12 @@ fn get_gpa(grade: u8) -> f32 {
 pub fn calc_with_terms(grades: Vec<Course>, terms: Vec<Term>) -> f32 {
     let mut total_gpa = 0.0;
     let mut total_credit = 0.0;
+    if !grades.is_empty() {
+        println!(
+            "{:<8}{:<8}{:<5}{:<30} ",
+            "Credit", "Score", "GPA", "CourseName"
+        );
+    }
     grades
         .iter()
         .filter(|course| course.class_type != "任选")
@@ -64,8 +70,8 @@ pub fn calc_with_terms(grades: Vec<Course>, terms: Vec<Term>) -> f32 {
         .for_each(|course| {
             let gpa = get_gpa(course.score);
             println!(
-                "Course: {}, Credit: {}, GPA: {:.4}",
-                course.name, course.credit, gpa
+                "{:<8}{:<8}{:<5.1}{:<30} ",
+                course.credit, course.score, gpa, course.name
             );
             total_gpa += gpa * course.credit;
             total_credit += course.credit;
