@@ -250,6 +250,7 @@ name = "choose_classes"
 version = "0.1.0"
 dependencies = [
  "base64",
+ "clap",
  "image",
  "reqwest",
  "serde",

@@ -10,10 +10,13 @@ use tokio;
 #[clap(version, name = "get_grades")]
 #[command(version, about, long_about = None)]
 struct Cli {
+    /// cookie路径
     #[clap(short, long, default_value = "resource/grades_cookie.txt")]
     cookie_txt: PathBuf,
+    /// 保存导出成绩的json文件路径
     #[clap(short, long, default_value = "resource/grades.json")]
     grades_json: PathBuf,
+    /// 保存原始成绩的json文件路径
     #[clap(short, long, default_value = "resource/raw_grades.json")]
     raw_grades_json: PathBuf,
 }
