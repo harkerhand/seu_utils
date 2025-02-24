@@ -3,6 +3,7 @@ use get_grades::Course;
 use reqwest::Client;
 use serde_json::Value;
 use std::fs;
+use std::io::Write;
 use std::path::PathBuf;
 use tokio;
 
@@ -44,7 +45,10 @@ async fn main() {
         let parsed: Value = serde_json::from_str(&text).unwrap();
         serde_json::to_string_pretty(&parsed).unwrap()
     };
-    fs::write(cli.raw_grades_json, formatted_json).unwrap();
+    let mut raw_grades_file = fs::File::create(&cli.raw_grades_json).unwrap();
+    raw_grades_file
+        .write_all(formatted_json.as_bytes())
+        .unwrap();
     let response: Value = serde_json::from_str(&text).unwrap();
 
     let grades = response["datas"]["xscjcx"]["rows"].as_array().unwrap();
@@ -58,9 +62,8 @@ async fn main() {
             term: grade["XNXQDM"].as_str().unwrap().into(),
         })
         .collect::<Vec<Course>>();
-    fs::write(
-        cli.grades_json,
-        serde_json::to_string_pretty(&grades).unwrap(),
-    )
-    .unwrap();
+    let mut grades_file = fs::File::create(&cli.grades_json).unwrap();
+    grades_file
+        .write_all(serde_json::to_string_pretty(&grades).unwrap().as_bytes())
+        .unwrap();
 }
