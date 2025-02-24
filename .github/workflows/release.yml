@@ -1,0 +1,62 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # 只在 tag 以 'v' 开头时触发，如 v1.0.0
+
+jobs:
+  build:
+    runs-on: windows-latest  # 运行环境改为 Windows
+
+    steps:
+      # 1. 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. 设置 Rust 环境
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt  # 需要的话可以添加
+
+      # 3. 编译项目 (Windows 平台)
+      - name: Build project
+        run: cargo build --release  # 生成 Windows EXE 文件
+
+      # 4. 生成空的 JSON 文件
+      - name: Create empty JSON files
+        run: |
+          echo "token: \nbatch_id: \nloginname: \npassword: " > config.yaml
+          echo {} > grades_cookie.txt
+
+      # 5. 创建 release 目录并移动构建产物
+      - name: Package the build
+        run: |
+          mkdir release
+          mkdir release\resource
+          copy config.yaml release\resource\
+          copy grades_cookie.txt release\resource\
+          Get-ChildItem -Path target\release -Filter *.exe | ForEach-Object { Copy-Item $_.FullName -Destination release\ }
+
+      # 6. 打包 release 目录
+      - name: Create zip archive
+        run: Compress-Archive -Path release\* -DestinationPath release_windows_x64.zip
+
+      # 7. 获取 tag message
+      - name: Build Changelog
+        id: build_changelog
+        uses: mikepenz/release-changelog-builder-action@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 8. 创建 GitHub Release
+      - name: Create Release and Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: "What's New: \n\n${{ steps.build_changelog.outputs.changelog }}"
+          files: release_windows_x64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
