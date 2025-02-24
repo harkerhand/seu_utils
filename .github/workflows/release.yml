@@ -48,7 +48,7 @@ jobs:
         id: build_changelog
         uses: mikepenz/release-changelog-builder-action@v5
         with:
-          toTag: "v1.0"
+          fromTag: "v1.0"
           configurationJson: |
             {
               "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n#{{UNCATEGORIZED}}\n</details>",
@@ -67,7 +67,7 @@ jobs:
                 },
                 {
                     "title": "## 💬 Other",
-                    "labels": ["other"]
+                    "labels": ["other", "chore", "doc", "refactor", "style", "CI/CD"]
                 },
                 {
                     "title": "## 📦 Dependencies",
