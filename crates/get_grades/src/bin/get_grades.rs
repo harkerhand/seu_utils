@@ -26,7 +26,10 @@ struct Cli {
 async fn main() {
     let cli = Cli::parse();
 
-    let cookie: String = fs::read_to_string(cli.cookie_txt).unwrap();
+    let cookie = fs::read_to_string(cli.cookie_txt)
+        .unwrap()
+        .trim()
+        .to_string();
     let client = Client::new();
     let grades_url = "https://ehall.seu.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do";
     let response =  client.post(grades_url)
