@@ -16,18 +16,24 @@ SEU Utils 是一款专为东南大学（SEU）学生打造的工具集合，旨�
 
 **⚠️ 注意事项：**
 
-- 作者能力精力有限，本工具仅保证 64bit Windows 平台的正常使用，其他平台请自行测试，如果你愿意对多平台进行适配，请提交 [PR](https://github.com/harkerhand/seu_utils/pulls)
-- **当前版本**尚未发布二进制文件，请自行编译。
-- 强烈建议把各类文件放在可执行文件的 `resource` 路径下
-- 除去特殊标记 **IN_NEED** 的文件，其他文件可以为无意义空文件
+- 作者能力精力财力有限，本工具仅保证 64bit Windows
+  平台的正常使用，其他平台请自行测试，如果你愿意对多平台进行适配，请提交 [PR](https://github.com/harkerhand/seu_utils/pulls)
+- 本工具仅供学习交流使用，不得用于任何商业用途，否则后果自负
+- 所有的可执行文件都需要在命令行中运行，不支持图形化界面
+- 特殊标记 **IN_NEED** 的文件，需要手动提供，其他文件会自动生成
+- 默认的资源文件路径为 `resource/`，可以通过命令行参数进行修改，但不建议修改
 
 ---
 
 ### 获取选课系统token和batch_id
 
+**编译命令**
+
 ```text
 cargo run -p choose_classes --bin get_tokens -- <OPTIONS>
 ```
+
+**使用说明**
 
 ```text
 
@@ -40,7 +46,7 @@ Options:
   -V, --version                    Print version
 ```
 
-#### 配置文件解析
+#### 配置文件解析 `config.yaml`
 
 ```yaml
 token: 
@@ -49,15 +55,22 @@ loginname: <your loginname>
 password: <your password>
 ```
 
-`token` 和 `batch_id` 留空即可，`password` 需要你自行提前打开选课系统，在开发者调试台中查看网络请求 `login` 的负载获取。
+- `token` 留空即可
+- `batch_id` 需要你进入选课系统后，在开发者调试台中查看网络请求 `list` 的请求头 `Referer` 字段获取
+- `loginname` 为你的一卡通号
+- `password` 需要你在选课系统登录页面，点击登录后，在开发者调试台中查看网络请求 `login` 的负载 `password` 字段获取。
 
 ---
 
 ### 选课课程查询 & 课程信息解析 & 生成选课计划并自动选课
 
+**编译命令**
+
 ```text
 cargo run -p choose_classes --bin choose_classes -- <OPTIONS>
 ```
+
+**使用说明**
 
 ```text
 Usage: choose_classes.exe [OPTIONS]
@@ -70,15 +83,20 @@ Options:
   -V, --version                      Print version
 ```
 
-配置文件同上，`classes.json` 为全部课程信息，`choose.json` 为你想要选择的课程信息。
+- 配置文件同上
+- `classes.json` 为全部课程信息，`choose.json` 为你想要选择的课程信息，会自动生成
 
 ---
 
 ### 课程成绩查询
 
+**编译命令**
+
 ```text
 cargo run -p get_grades --bin get_grades -- <OPTIONS>
 ```
+
+**使用说明**
 
 ```text
 Usage: get_grades.exe [OPTIONS]
@@ -91,15 +109,19 @@ Options:
   -V, --version                            Print version
 ```
 
-cookie 需要自行打开选课系统，在开发者调试台中查看 `*.do` 的请求头获取。此cookie时效性很强，建议每次使用前都重新获取。
+cookie 需要进入成绩查询系统后，在开发者调试台中查看任意后缀为 `.do` 的请求头 `Cookie` 字段获取。此cookie时效性很强，建议每次使用前都重新获取。
 
 --- 
 
 ### 绩点计算
 
+**编译命令**
+
 ```text
 cargo run -p get_grades --bin calc_gpa -- <OPTIONS>
 ```
+
+**使用说明**
 
 ```text
 Usage: calc_gpa.exe [OPTIONS]
