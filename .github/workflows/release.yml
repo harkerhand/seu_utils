@@ -27,7 +27,7 @@ jobs:
       # 4. 生成空的 JSON 文件
       - name: Create empty JSON files
         run: |
-          echo -e "token: \nbatch_id: \nloginname: \npassword: " > config.yaml
+          "token: `nbatch_id: `nloginname: `npassword: " | Set-Content -Path config.yaml
           echo {} > grades_cookie.txt
 
       # 5. 创建 release 目录并移动构建产物
