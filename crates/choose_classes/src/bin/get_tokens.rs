@@ -1,4 +1,5 @@
 use base64::Engine;
+use cfg_if::cfg_if;
 use choose_classes::Config;
 use clap::Parser;
 use reqwest::{Client, Error};
@@ -40,10 +41,18 @@ fn decode_and_show_image(
 
     let current_dir = std::env::current_dir().unwrap();
     let captcha_png = current_dir.join(captcha_png);
-    Command::new("cmd")
-        .arg("/C")
-        .arg(format!("start {}", captcha_png.to_str().unwrap()))
-        .spawn()?;
+    cfg_if! {
+        if #[cfg(target_os = "windows")] {
+            Command::new("cmd")
+                .arg("/C")
+                .arg(format!("start {}", captcha_png.to_str().unwrap()))
+                .spawn()?;
+        } else if #[cfg(target_os = "macos")] {
+            Command::new("open").arg(captcha_png).spawn()?;
+        } else {
+            Command::new("xdg-open").arg(captcha_png).spawn()?;
+        }
+    }
 
     Ok(())
 }
@@ -58,6 +67,7 @@ async fn get_login_data(cli: &Cli) -> Result<LoginData, Error> {
     let response = client
         .post(captcha_url)
         .header("Content-Length", "0")
+        .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36")
         .send()
         .await?;
     let response: Value = serde_json::from_str(&response.text().await?).unwrap();
@@ -96,7 +106,9 @@ async fn get_token(data: &LoginData) -> Result<String, Error> {
         .send()
         .await?;
 
-    let response: Value = serde_json::from_str(&response.text().await?).unwrap();
+    let response_text = &response.text().await?;
+    println!("Token response: {}", response_text);
+    let response: Value = serde_json::from_str(response_text).unwrap();
     Ok(response["data"]["token"].as_str().unwrap().to_string())
 }
 
