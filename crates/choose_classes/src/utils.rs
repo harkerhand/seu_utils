@@ -91,7 +91,7 @@ pub async fn get_course_list(
     println!("Status Code: {}", status_code);
 
     let body = res.text().await?;
-    // println!("Content: {}", body);
+    println!("Content: {}", body);
 
     let mut file = fs::File::create(classes_json).unwrap();
     file.write_all(body.as_bytes()).unwrap();
@@ -111,9 +111,9 @@ pub async fn gene_wish_list(
     if !re_generate {
         return Ok(())
     }
+    println!("Generating wish list...");
     let courses = get_course_list("TJKC", client, token, batch_id, classes_json).await?;
     let data = courses["data"]["rows"].as_array().unwrap();
-
 
     let mut want_courses = Vec::new();
 
@@ -161,6 +161,7 @@ pub async fn choose_courses(
     batch_id: &str,
     choose_json: &PathBuf,
 ) -> Result<(), Error> {
+    println!("Choosing courses...");
     let want_courses: Vec<WantCourse> =
         serde_json::from_str(&fs::read_to_string(choose_json).unwrap()).unwrap();
 

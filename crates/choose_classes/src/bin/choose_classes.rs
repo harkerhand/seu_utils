@@ -28,6 +28,8 @@ async fn main() {
         serde_yaml::from_str(&fs::read_to_string(&cli.config_yaml).unwrap()).unwrap();
     let token = &config.token;
     let batch_id = &config.batch_id;
+    println!("Token: {}", token);
+    println!("Batch ID: {}", batch_id);
 
     let client = Client::new();
 
