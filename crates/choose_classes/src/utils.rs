@@ -64,7 +64,7 @@ pub async fn get_course_list(
     let request_body = serde_json::json!({
         "teachingClassType": class_type,
         "pageNumber": 1,
-        "pageSize": 20,
+        "pageSize": 99,
         "orderBy": "",
         "campus": "1",
     });
@@ -106,9 +106,14 @@ pub async fn gene_wish_list(
     batch_id: &str,
     classes_json: &PathBuf,
     choose_json: &PathBuf,
+    re_generate: bool,
 ) -> Result<(), Error> {
+    if !re_generate {
+        return Ok(())
+    }
     let courses = get_course_list("TJKC", client, token, batch_id, classes_json).await?;
     let data = courses["data"]["rows"].as_array().unwrap();
+
 
     let mut want_courses = Vec::new();
 
@@ -120,10 +125,11 @@ pub async fn gene_wish_list(
             let name = clss["KCM"].as_str().unwrap();
             let unknow = Value::String("unknow".to_string());
             let skjs = clss.get("SKJS").unwrap_or(&unknow).as_str().unwrap();
+            let teaching_place = clss.get("teachingPlace").unwrap_or(&unknow).as_str().unwrap();
 
             println!(
-                "Do you want to select the course {}({})? (y/n): ",
-                name, skjs
+                "Do you want to select the course {}({}) at \"{}\"? (y/n): ",
+                name, skjs, teaching_place
             );
             let mut user_input = String::new();
             std::io::stdin().read_line(&mut user_input).unwrap();
@@ -157,6 +163,11 @@ pub async fn choose_courses(
 ) -> Result<(), Error> {
     let want_courses: Vec<WantCourse> =
         serde_json::from_str(&fs::read_to_string(choose_json).unwrap()).unwrap();
+
+    if want_courses.is_empty() {
+        println!("No courses to choose from. Please generate a wish list first.");
+        return Ok(());
+    }
 
     let mut i = 0;
     loop {
